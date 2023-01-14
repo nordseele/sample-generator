@@ -201,7 +201,7 @@ def main():
     wandb_logger = pl.loggers.WandbLogger(project=args.name, log_model='all' if args.save_wandb=='all' else None)
 
     exc_callback = ExceptionCallback()
-    ckpt_callback = pl.callbacks.ModelCheckpoint(every_n_train_steps=args.checkpoint_every, save_top_k=1, dirpath=save_path)
+    ckpt_callback = pl.callbacks.ModelCheckpoint(every_n_train_steps=args.checkpoint_every, save_top_k=args.save_top, dirpath=save_path)
     demo_callback = DemoCallback(args)
 
     diffusion_model = DiffusionUncond(args)
