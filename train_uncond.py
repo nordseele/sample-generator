@@ -183,6 +183,17 @@ class DemoCallback(pl.Callback):
         except Exception as e:
             print(f'{type(e).__name__}: {e}', file=sys.stderr)
 
+class StatusCallback(pl.Callback):
+    def on_train_start(self, trainer, module):
+        print("Training is starting")
+
+    def on_train_end(self, trainer, module):
+        print("Training is ending")
+
+class WhereIsTheCkptCallback(pl.Callback):
+    def on_save_checkpoint(self, trainer, module )
+        print("Saving Checkpoint !")
+
 def main():
 
     args = get_all_args()
@@ -203,6 +214,8 @@ def main():
     exc_callback = ExceptionCallback()
     ckpt_callback = pl.callbacks.ModelCheckpoint(every_n_train_steps=args.checkpoint_every, save_top_k=args.save_top, dirpath=save_path)
     demo_callback = DemoCallback(args)
+    status_callback = StatusCallback()
+    ckpt_path_callback = WhereIsTheCkptCallback()
 
     diffusion_model = DiffusionUncond(args)
 
@@ -216,7 +229,7 @@ def main():
         # strategy='ddp',
         precision=16,
         accumulate_grad_batches=args.accum_batches, 
-        callbacks=[ckpt_callback, demo_callback, exc_callback],
+        callbacks=[ckpt_callback, demo_callback, exc_callback, status_callback, ckpt_path_callback],
         logger=wandb_logger,
         log_every_n_steps=1,
         max_epochs=10000000,
