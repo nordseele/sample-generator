@@ -189,9 +189,7 @@ class StatusCallback(pl.Callback):
 
     def on_train_end(self, trainer, module):
         print("Training is ending")
-
-    def on_save_checkpoint(self):
-        print("Saving Checkpoint !")
+        
 
 def main():
 
