@@ -191,7 +191,7 @@ class StatusCallback(pl.Callback):
         print("Training is ending")
 
 class WhereIsTheCkptCallback(pl.Callback):
-    def on_save_checkpoint(self, trainer, module):
+    def on_save_checkpoint(self):
         print("Saving Checkpoint !")
 
 def main():
