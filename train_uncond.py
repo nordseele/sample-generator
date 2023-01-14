@@ -190,11 +190,8 @@ class StatusCallback(pl.Callback):
     def on_train_end(self, trainer, module):
         print("Training is ending")
 
-class WhereIsTheCkptCallback(pl.Callback):
-    def on_save_checkpoint(self, trainer):
+    def on_save_checkpoint(self):
         print("Saving Checkpoint !")
-        filepath = trainer['filepath']
-        print("Checkpoint saved at: ", filepath)
 
 def main():
 
@@ -217,7 +214,6 @@ def main():
     ckpt_callback = pl.callbacks.ModelCheckpoint(every_n_train_steps=args.checkpoint_every, save_top_k=args.save_top, dirpath=save_path)
     demo_callback = DemoCallback(args)
     status_callback = StatusCallback()
-    ckpt_path_callback = WhereIsTheCkptCallback()
 
     diffusion_model = DiffusionUncond(args)
 
@@ -231,7 +227,7 @@ def main():
         # strategy='ddp',
         precision=16,
         accumulate_grad_batches=args.accum_batches, 
-        callbacks=[ckpt_callback, demo_callback, exc_callback, status_callback, ckpt_path_callback],
+        callbacks=[ckpt_callback, demo_callback, exc_callback, status_callback],
         logger=wandb_logger,
         log_every_n_steps=1,
         max_epochs=10000000,
