@@ -87,6 +87,9 @@ def sample(model, x, steps, eta):
     return pred
 
 
+gauth = GoogleAuth()
+gauth.LocalWebserverAuth()
+drive = GoogleDrive(gauth)
 
 class DiffusionUncond(pl.LightningModule):
     def __init__(self, global_args):
@@ -197,14 +200,12 @@ class GoogleDriveUploadCallback(pl.Callback):
     def __init__(self, drive_folder_id: str):
         super().__init__()
         self.drive_folder_id = drive_folder_id
-        gauth = GoogleAuth()
-        gauth.LocalWebserverAuth() 
-        self.drive = GoogleDrive(gauth)
 
     def on_save_checkpoint(self, checkpoint, pl_module, epoch, **kwargs):
         # Upload the .ckpt file to Google Drive
-        file_drive = self.drive.CreateFile({'parents': [{'id': self.drive_folder_id}]})
+        file_drive = drive.CreateFile({'parents': [{'id': self.drive_folder_id}]})
         file_drive.Upload()
+
 
 
 def main():
