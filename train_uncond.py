@@ -24,6 +24,8 @@ from audio_diffusion.models import DiffusionAttnUnet1D
 from audio_diffusion.utils import ema_update
 from viz.viz import audio_spectrogram_image
 
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 # Define the noise schedule and sampling loop
 def get_alphas_sigmas(t):
@@ -191,6 +193,20 @@ class StatusCallback(pl.Callback):
         print("\nTraining has stopped\n")
         
 
+class GoogleDriveUploadCallback(pl.Callback):
+    def __init__(self, drive_folder_id: str):
+        super().__init__()
+        self.drive_folder_id = drive_folder_id
+        gauth = GoogleAuth()
+        gauth.LocalWebserverAuth() 
+        self.drive = GoogleDrive(gauth)
+
+    def on_save_checkpoint(self, checkpoint, pl_module, epoch, **kwargs):
+        # Upload the .ckpt file to Google Drive
+        file_drive = self.drive.CreateFile({'parents': [{'id': self.drive_folder_id}]})
+        file_drive.Upload()
+
+
 def main():
 
     args = get_all_args()
@@ -212,6 +228,9 @@ def main():
     ckpt_callback = pl.callbacks.ModelCheckpoint(every_n_train_steps=args.checkpoint_every, save_top_k=args.save_top, dirpath=save_path)
     demo_callback = DemoCallback(args)
     status_callback = StatusCallback()
+    # Initialize the callback and pass in the Google Drive folder ID
+    gdrive_callback = GoogleDriveUploadCallback(drive_folder_id='your_folder_id')
+
 
     diffusion_model = DiffusionUncond(args)
 
@@ -225,7 +244,7 @@ def main():
         # strategy='ddp',
         precision=16,
         accumulate_grad_batches=args.accum_batches, 
-        callbacks=[ckpt_callback, demo_callback, exc_callback, status_callback],
+        callbacks=[ckpt_callback, demo_callback, exc_callback, status_callback, gdrive_callback],
         logger=wandb_logger,
         log_every_n_steps=1,
         max_epochs=10000000,
