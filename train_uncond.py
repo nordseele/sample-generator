@@ -185,10 +185,10 @@ class DemoCallback(pl.Callback):
 
 class StatusCallback(pl.Callback):
     def on_train_start(self, trainer, module):
-        print("Training is starting")
+        print("\nTraining is starting\n")
 
     def on_train_end(self, trainer, module):
-        print("Training is ending")
+        print("\nTraining has stopped\n")
         
 
 def main():
